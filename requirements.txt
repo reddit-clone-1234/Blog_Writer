@@ -1,0 +1,16 @@
+streamlit==1.25.0
+langchain==0.0.271
+python-dotenv
+altair<5
+wikipedia
+google-api-python-client
+duckduckgo-search
+openai
+tiktoken
+pyperclip
+pdf2image
+pytesseract
+unstructured
+PyPDF2
+qdrant_client
+chromadb

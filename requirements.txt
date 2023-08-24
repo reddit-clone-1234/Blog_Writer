@@ -1,5 +1,5 @@
 streamlit==1.18.0
-langchain==0.0.271
+langchain==0.0.27
 python-dotenv
 altair<5
 wikipedia

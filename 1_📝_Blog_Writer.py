@@ -27,7 +27,7 @@ from langchain.chains import RetrievalQAWithSourcesChain
 from langchain.callbacks import get_openai_callback
 
 # import pyperclip
-from PyPDF2 import PdfReader
+from PyPDF2 import PdfReader    
 from constants import (
     # OPENAI_API_KEY,
     GOOGLE_API_KEY,

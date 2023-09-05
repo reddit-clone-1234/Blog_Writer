@@ -14,3 +14,4 @@ tiktoken
 pdf2image
 pytesseract
 unstructured
+streamlit-authenticator

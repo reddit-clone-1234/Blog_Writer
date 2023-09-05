@@ -1,3 +1,5 @@
+import streamlit_authenticator as stauth
+
 def count_words_with_bullet_points(input_string):
     bullet_points = [
         "*",

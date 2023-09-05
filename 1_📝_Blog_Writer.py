@@ -21,7 +21,7 @@ import os
 from langchain.document_loaders import UnstructuredURLLoader
 import pickle
 from langchain.vectorstores import FAISS, Chroma
-from langchain.embeddings import OpenAIEmbeddings
+from langchain.embeddings import HuggingFaceEmbeddings
 # import faiss
 from langchain.chains import RetrievalQAWithSourcesChain
 from langchain.callbacks import get_openai_callback
@@ -84,8 +84,8 @@ def main():
         duck = DuckDuckGoSearchRun()
         # models
 
-        llm_keywords = ChatOpenAI(temperature=0.5, model="gpt-4")
-        title_llm = ChatOpenAI(temperature=0.5, model="gpt-4")  # temperature=0.7
+        llm_keywords = ChatOpenAI(temperature=0.5, model="gpt-3.5-turbo-16k")
+        title_llm = ChatOpenAI(temperature=0.5, model="gpt-3.5-turbo-16k")  # temperature=0.7
         summarize_llm = ChatOpenAI(
             temperature=0, model="gpt-3.5-turbo-16k"
         )  # or OpenAI(temperature=0)
@@ -95,7 +95,7 @@ def main():
         )
         writer_llm = ChatOpenAI(temperature=0, model="gpt-3.5-turbo-16k")
         reference_llm = ChatOpenAI(temperature=0, model="gpt-3.5-turbo-16k")
-        evaluation_llm = ChatOpenAI(temperature=0, model="gpt-4")
+        evaluation_llm = ChatOpenAI(temperature=0, model="gpt-3.5-turbo-16k")
         # Keyphrase extraction Agent
         keyword_extractor_tools = [
             Tool(
@@ -363,7 +363,7 @@ def main():
         # )
 
         # take the topic from the user
-        embeddings = OpenAIEmbeddings()
+        embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
         # with open("faiss_store_openai.pkl", "rb") as f:
         #     vectorStore_openAI = pickle.load(f)
 

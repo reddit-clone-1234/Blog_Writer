@@ -14,3 +14,4 @@ pdf2image
 pytesseract
 unstructured
 chromadb
+pysqlite3-binary

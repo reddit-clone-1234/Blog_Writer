@@ -29,7 +29,7 @@ from langchain.callbacks import get_openai_callback
 # import pyperclip
 from PyPDF2 import PdfReader
 from constants import (
-    # OPENAI_API_KEY,
+    OPENAI_API_KEY,
     GOOGLE_API_KEY,
     GOOGLE_CSE_ID,
     QDRANT_COLLECTION_NAME,

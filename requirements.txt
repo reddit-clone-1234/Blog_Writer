@@ -13,6 +13,7 @@ tiktoken
 pdf2image
 pytesseract
 unstructured
-chromadb
-pysqlite3-binary
+# chromadb
+# pysqlite3-binary
 sentence_transformers
+faiss-cpu

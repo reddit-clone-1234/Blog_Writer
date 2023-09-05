@@ -35,7 +35,6 @@ from constants import (
     QDRANT_COLLECTION_NAME,
     QDRANT_API_KEY,
     QDRANT_HOST,
-    OPENAI_API_KEY,
 )
 from utils import (
     count_words_with_bullet_points,

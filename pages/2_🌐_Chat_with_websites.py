@@ -589,7 +589,7 @@ def main_function():
 def main():
     st.set_page_config(page_title="Blog Writer Agent", page_icon="💬", layout="wide")
     st.title("Blog Writer Agent: Write a blog about any topic 💬")
-    with open("../etc/secrets/config.yaml") as file:
+    with open("./etc/secrets/config.yaml") as file:
         config = yaml.load(file, Loader=SafeLoader)
     authenticator = stauth.Authenticate(
         config["credentials"],

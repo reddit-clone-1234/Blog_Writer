@@ -15,3 +15,4 @@ pytesseract
 unstructured
 chromadb
 pysqlite3-binary
+sentence_transformers

@@ -936,7 +936,7 @@ def main_function():
                         st.image(image_url)
                         img_res = requests.get(image_url)
                         img = Image.open(io.BytesIO(img_res.content))
-                        doc = create_word_docx(myTopic, blog, img)
+                        doc = create_word_docx(myTopic, st.session_state.blog_1, img)
                         # Save the Word document to a BytesIO buffer
                         doc_buffer = io.BytesIO()
                         doc.save(doc_buffer)

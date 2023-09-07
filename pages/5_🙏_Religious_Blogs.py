@@ -23,7 +23,6 @@ import os
 from langchain.vectorstores import Qdrant
 from langchain.embeddings import OpenAIEmbeddings, HuggingFaceEmbeddings
 from langchain import OpenAI
-# import faiss
 from langchain.chains import RetrievalQAWithSourcesChain
 from langchain.callbacks import get_openai_callback
 from qdrant_client import QdrantClient
@@ -38,11 +37,12 @@ from constants import (
 )
 from utils import (
     count_words_with_bullet_points,
+    create_word_docx,
 )
 import streamlit_authenticator as stauth
 import yaml
 from yaml.loader import SafeLoader
-
+import io
 def main_function():
     load_dotenv()
     keys_flag = False
@@ -588,6 +588,17 @@ def main_function():
                         progress = 1.0
                         progress_bar.progress(progress)
                         st.balloons()
+                        doc = create_word_docx(myTopic, blog, None)
+                        # Save the Word document to a BytesIO buffer
+                        doc_buffer = io.BytesIO()
+                        doc.save(doc_buffer)
+                        doc_buffer.seek(0)
+                        st.download_button(
+                            label="Download Word Document", 
+                            data=doc_buffer.getvalue(),
+                            file_name=f"{myTopic}.docx",
+                            mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                        )
                     # st.snow()
                 # add copy button to copy the draft to the clipboard
                 # copy_btn = st.button("Copy the blog to clipboard", key="copy1")
@@ -647,6 +658,17 @@ def main_function():
                         progress = 1.0
                         progress_bar.progress(progress)
                         st.balloons()
+                        doc = create_word_docx(myTopic, st.session_state.blog_5, None)
+                        # Save the Word document to a BytesIO buffer
+                        doc_buffer = io.BytesIO()
+                        doc.save(doc_buffer)
+                        doc_buffer.seek(0)
+                        st.download_button(
+                            label="Download Word Document", 
+                            data=doc_buffer.getvalue(),
+                            file_name=f"{myTopic}.docx",
+                            mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                        )
             except Exception as e:
                 print(e)
     else:

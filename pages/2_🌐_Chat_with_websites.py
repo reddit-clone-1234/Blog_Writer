@@ -34,11 +34,12 @@ from constants import (
 )
 from utils import (
     count_words_with_bullet_points,
+    create_word_docx
 )
 import streamlit_authenticator as stauth
 import yaml
 from yaml.loader import SafeLoader
-
+import io
 def main_function():
     load_dotenv()
     keys_flag = False
@@ -363,8 +364,7 @@ def main_function():
                         if "links" in st.session_state:
                             inserted_links = st.session_state.links
 
-                        print(inserted_links)
-                        print(type(inserted_links))
+                        print("inserted_links",inserted_links)
                         loaders = UnstructuredURLLoader(urls=inserted_links)
                         print("Loading data...")
                         data = loaders.load()
@@ -382,7 +382,8 @@ def main_function():
                         num_docs = len(data_docs)
                         similar_docs = vectorStore.similarity_search(
                             f"title: {title}, subtitle: {subtitle}, keywords: {keyword_list}",
-                            k=int(0.1 * num_docs) if int(0.1 * num_docs) < 28 else 28,
+                            k=10,
+                            # k=int(0.1 * num_docs) if int(0.1 * num_docs) < 28 else 28,
                         )
                         start = time.time()
                         blog_outline = writer_chain_outline.run(
@@ -522,6 +523,17 @@ def main_function():
                         progress = 1.0
                         progress_bar.progress(progress)
                         st.balloons()
+                        doc = create_word_docx(myTopic, blog, None)
+                        # Save the Word document to a BytesIO buffer
+                        doc_buffer = io.BytesIO()
+                        doc.save(doc_buffer)
+                        doc_buffer.seek(0)
+                        st.download_button(
+                            label="Download Word Document", 
+                            data=doc_buffer.getvalue(),
+                            file_name=f"{myTopic}.docx",
+                            mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                        )
                     # st.snow()
                 # add copy button to copy the draft to the clipboard
                 # copy_btn = st.button("Copy the blog to clipboard", key="copy1")
@@ -581,6 +593,16 @@ def main_function():
                         progress = 1.0
                         progress_bar.progress(progress)
                         st.balloons()
+                        doc = create_word_docx(myTopic, st.session_state.blog_2, None)
+                        doc_buffer = io.BytesIO()
+                        doc.save(doc_buffer)
+                        doc_buffer.seek(0)
+                        st.download_button(
+                            label="Download Word Document", 
+                            data=doc_buffer.getvalue(),
+                            file_name=f"{myTopic}.docx",
+                            mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                        )
             except Exception as e:
                 print(e)
     else:

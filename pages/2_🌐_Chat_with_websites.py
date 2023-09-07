@@ -1,3 +1,4 @@
+from langchain.docstore.document import Document
 from langchain.agents import Tool, initialize_agent, AgentType
 from langchain.utilities import (
     WikipediaAPIWrapper,
@@ -6,7 +7,6 @@ from langchain.utilities import (
 from langchain.tools import WikipediaQueryRun, DuckDuckGoSearchRun
 from langchain import OpenAI
 from dotenv import load_dotenv
-from langchain.callbacks import get_openai_callback
 
 from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain, SequentialChain
@@ -22,24 +22,31 @@ from langchain.document_loaders import UnstructuredURLLoader
 import pickle
 from langchain.vectorstores import FAISS, Chroma
 from langchain.embeddings import OpenAIEmbeddings, HuggingFaceEmbeddings
-
 import faiss
 from langchain.chains import RetrievalQAWithSourcesChain
+from langchain.callbacks import get_openai_callback
+from PIL import Image
+import requests
+import io
 
-import pyperclip
+# import pyperclip
+from PyPDF2 import PdfReader
 from constants import (
     OPENAI_API_KEY,
     GOOGLE_API_KEY,
     GOOGLE_CSE_ID,
+    QDRANT_COLLECTION_NAME,
+    QDRANT_API_KEY,
+    QDRANT_HOST,
 )
 from utils import (
     count_words_with_bullet_points,
-    create_word_docx
+    create_word_docx,
 )
 import streamlit_authenticator as stauth
 import yaml
 from yaml.loader import SafeLoader
-import io
+
 def main_function():
     load_dotenv()
     keys_flag = False

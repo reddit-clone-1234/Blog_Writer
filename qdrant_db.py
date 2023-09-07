@@ -14,16 +14,17 @@ from langchain.document_loaders import (
 
 load_dotenv()
 client = QdrantClient(
-    os.getenv("QDRANT_HOST"),
+    url=os.getenv("QDRANT_HOST"),
     api_key=os.getenv("QDRANT_API_KEY"),
+    timeout=100000,
 )
 
 
-embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
-# embeddings = OpenAIEmbeddings()
+# embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+embeddings = OpenAIEmbeddings()
 vectorStore = Qdrant(
     client=client,
-    collection_name=os.getenv("QDRANT_COLLECTION_NAME"),
+    collection_name=os.getenv("QDRANT_COLLECTION_ISLAMIC"),
     embeddings=embeddings,
 )
 
@@ -46,33 +47,19 @@ text_splitter = RecursiveCharacterTextSplitter(
 )
 # 1536 open ai embeddings
 # 768 hugging face embeddings
-vectors_config = models.VectorParams(size=768, distance=models.Distance.COSINE)
+vectors_config = models.VectorParams(size=1536, distance=models.Distance.COSINE)
 client.recreate_collection(
-    collection_name=os.getenv("QDRANT_COLLECTION_NAME"),
+    collection_name=os.getenv("QDRANT_COLLECTION_ISLAMIC"),
     vectors_config=vectors_config,
 )
 print("collection created")
-bible_loader = PyMuPDFLoader("D:/projects/AI projects/privateGPT/test_docs/bible.pdf")
-quran_loader = PyMuPDFLoader(
-    "D:/projects/AI projects/privateGPT/test_docs/Holy-Quran-English.pdf"
+loader = PyMuPDFLoader(
+    "D:/projects/AI projects/privateGPT-main/source_documents/Tafsir_Al_Mizan_Vol1.pdf"
 )
 print("loaders created")
-bible_docs = bible_loader.load_and_split(text_splitter=text_splitter)
-quran_docs = quran_loader.load_and_split(text_splitter=text_splitter)
+docs = loader.load_and_split(text_splitter=text_splitter)
 # print(bible_docs[0])
 # print(quran_docs[0])
 print("docs loaded")
-# vectorStore.from_documents(bible_docs,embedding=embeddings)
-Qdrant.from_documents(
-    bible_docs,
-    embedding=embeddings,
-    url=os.getenv("QDRANT_HOST"),
-    api_key=os.getenv("QDRANT_API_KEY"),
-    collection_name=os.getenv("QDRANT_COLLECTION_NAME"),
-    prefer_grpc=True,
-)
-print("bible added")
-vectorStore.add_documents(quran_docs)
+vectorStore.add_documents(docs)
 print("quran added")
-docs = vectorStore.similarity_search("Jesus Christ")
-print(docs[0])

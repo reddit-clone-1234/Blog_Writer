@@ -31,7 +31,7 @@ from qdrant_client import QdrantClient
 from PyPDF2 import PdfReader
 from constants import (
     # OPENAI_API_KEY,
-    QDRANT_COLLECTION_NAME_1,
+    QDRANT_COLLECTION_ISLAMIC,
     QDRANT_API_KEY,
     QDRANT_HOST,
 )
@@ -43,6 +43,8 @@ import streamlit_authenticator as stauth
 import yaml
 from yaml.loader import SafeLoader
 import io
+
+
 def main_function():
     load_dotenv()
     keys_flag = False
@@ -62,7 +64,7 @@ def main_function():
     #         keys_flag = True
     #         st.session_state.OPENAI_API_KEY = OPENAI_API_KEY
     keys_flag = True
-    if keys_flag: # or "OPENAI_API_KEY" in st.session_state:
+    if keys_flag:  # or "OPENAI_API_KEY" in st.session_state:
         # os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
 
         # search engines
@@ -114,7 +116,7 @@ def main_function():
             tools=title_tools,
             verbose=True,
             handle_parsing_errors=True,
-        ) 
+        )
 
         # summarize the results separately
         summary_prompt = """Please Provide a summary of the following essay
@@ -322,7 +324,6 @@ def main_function():
         #
         embeddings = OpenAIEmbeddings()
 
-
         client = QdrantClient(
             url=QDRANT_HOST,
             api_key=QDRANT_API_KEY,
@@ -331,7 +332,7 @@ def main_function():
 
         vectorStore = Qdrant(
             client=client,
-            collection_name=QDRANT_COLLECTION_NAME_1,
+            collection_name=QDRANT_COLLECTION_ISLAMIC,
             embeddings=embeddings,
         )
 
@@ -339,8 +340,7 @@ def main_function():
             "This is a blog writer agent that uses the following as sources of information:"
         )
         # unordered list
-        st.markdown("""- Bible""")
-        st.markdown("""- Quran""")
+        st.markdown("""- Tafsir Al-Mizan for Quran""")
 
         myTopic = st.text_input("Write a blog about: ", key="query")
 
@@ -594,7 +594,7 @@ def main_function():
                         doc.save(doc_buffer)
                         doc_buffer.seek(0)
                         st.download_button(
-                            label="Download Word Document", 
+                            label="Download Word Document",
                             data=doc_buffer.getvalue(),
                             file_name=f"{myTopic}.docx",
                             mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
@@ -670,7 +670,7 @@ def main_function():
                         doc.save(doc_buffer)
                         doc_buffer.seek(0)
                         st.download_button(
-                            label="Download Word Document", 
+                            label="Download Word Document",
                             data=doc_buffer.getvalue(),
                             file_name=f"{myTopic}.docx",
                             mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
@@ -679,6 +679,7 @@ def main_function():
                 print(e)
     else:
         st.warning("Please enter your API KEY first", icon="⚠")
+
 
 def main():
     st.set_page_config(page_title="Blog Writer Agent", page_icon="💬", layout="wide")
@@ -700,6 +701,8 @@ def main():
         st.error("Username/password is incorrect")
     elif authentication_status == None:
         st.warning("Please enter your username and password")
+
+
 if __name__ == "__main__":
     with get_openai_callback() as cb:
         main()

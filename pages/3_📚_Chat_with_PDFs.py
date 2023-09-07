@@ -33,7 +33,6 @@ from constants import (
     # OPENAI_API_KEY,
     GOOGLE_API_KEY,
     GOOGLE_CSE_ID,
-    QDRANT_COLLECTION_NAME,
     QDRANT_API_KEY,
     QDRANT_HOST,
 )

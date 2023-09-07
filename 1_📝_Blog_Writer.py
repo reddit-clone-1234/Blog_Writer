@@ -25,6 +25,9 @@ from langchain.embeddings import OpenAIEmbeddings, HuggingFaceEmbeddings
 import faiss
 from langchain.chains import RetrievalQAWithSourcesChain
 from langchain.callbacks import get_openai_callback
+from PIL import Image
+import requests
+import io
 
 # import pyperclip
 from PyPDF2 import PdfReader
@@ -38,6 +41,8 @@ from constants import (
 )
 from utils import (
     count_words_with_bullet_points,
+    get_src_original_url,
+    create_word_docx,
 )
 import streamlit_authenticator as stauth
 import yaml
@@ -795,25 +800,16 @@ def main_function():
                         end = time.time()
                         st.session_state.blog_1 = blog
                         st.write(blog)
-                        # similar_docs = vectorStore.similarity_search(
-                        #     blog,
-                        #     k=10,
-                        #     # k=int(0.1 * num_docs) if int(0.1 * num_docs) < 28 else 28,
-                        # )
-                        # st.write("### Final Blog References")
-                        # for i in range(len(similar_docs)):
-                        #     st.write(
-                        #         f"* Souce no. {i+1} : *"
-                        #         + similar_docs[i].metadata["source"]
-                        #         + ":"
-                        #     )
-                        #     try:
-                        #         st.write(
-                        #             f'>>> *Page no. {similar_docs[i].metadata["page"]}* : '
-                        #             + similar_docs[i].page_content
-                        #         )
-                        #     except:
-                        #         print(f">>>" + similar_docs[i].page_content)
+                        image_url = get_src_original_url(myTopic)
+                        st.image(image_url)
+                        st.session_state.image_url_1 = image_url
+                        img_res = requests.get(image_url)
+                        img = Image.open(io.BytesIO(img_res.content))
+                        doc = create_word_docx(myTopic, blog, img)
+                        # Save the Word document to a BytesIO buffer
+                        doc_buffer = io.BytesIO()
+                        doc.save(doc_buffer)
+                        doc_buffer.seek(0)
 
                         # get the number of words in a string: split on whitespace and end of line characters
                         blog_word_count = count_words_with_bullet_points(blog)
@@ -825,17 +821,22 @@ def main_function():
                         progress += 0.125
                         progress_bar.progress(progress)
                         st.balloons()
-                    # st.snow()
+                        # Prepare the download link
+                        st.download_button(
+                            label="Download Word Document", 
+                            data=doc_buffer.getvalue(),
+                            file_name=f"{myTopic}.docx",
+                            mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                        )
+                        # st.snow()
 
                 #########################################
-                # get the cost per operation
-                # st.write("### Cost per operation")
 
                 # add copy button to copy the draft to the clipboard
                 # copy_btn = st.button("Copy the blog to clipboard", key="copy1")
                 # if copy_btn:
                 #     pyperclip.copy(draft1)
-                # st.success("The blog copied to clipboard")
+                #     st.success("The blog copied to clipboard")
             except Exception as e:
                 st.error("Something went wrong, please try again")
                 st.error(e)
@@ -930,13 +931,33 @@ def main_function():
                     if st.session_state.blog_1 is not None:
                         st.write("### Final Blog")
                         st.write(st.session_state.blog_1)
-                        # word count
+                        image_url = st.session_state.image_url_1
+
+                        # get the number of words in a string: split on whitespace and end of line characters
+                        blog_word_count = count_words_with_bullet_points(blog)
+                        st.write(f"> Blog word count: {blog_word_count}")
                         st.write(
-                            f"> Blog word count: {count_words_with_bullet_points(st.session_state.blog_1)}"
+                            f"> Generating the blog took ({round(end - start, 2)} s)"
                         )
                         progress += 0.125
                         progress_bar.progress(progress)
                         st.balloons()
+                        st.image(image_url)
+                        # img_res = requests.get(image_url)
+                        # img = Image.open(io.BytesIO(img_res.content))
+                        # doc = create_word_docx(myTopic, blog, img)
+                        # # Save the Word document to a BytesIO buffer
+                        # doc_buffer = io.BytesIO()
+                        # doc.save(doc_buffer)
+                        # doc_buffer.seek(0)
+                        # st.success("Blog generated successfully")
+                        # # Prepare the download link
+                        # st.download_button(
+                        #     label="Download Word Document", 
+                        #     data=doc_buffer.getvalue(),
+                        #     file_name=f"{myTopic}.docx",
+                        #     mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                        # )
             except Exception as e:
                 print(e)
     else:

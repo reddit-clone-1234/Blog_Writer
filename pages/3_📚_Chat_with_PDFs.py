@@ -130,7 +130,7 @@ def main_function():
         title_agent = initialize_agent(
             title_tools,
             title_llm,
-            agent=AgentType.title_agent,
+            agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
             verbose=True,
             handle_parsing_errors=True,
         )

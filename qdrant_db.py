@@ -47,11 +47,11 @@ text_splitter = RecursiveCharacterTextSplitter(
 )
 # 1536 open ai embeddings
 # 768 hugging face embeddings
-vectors_config = models.VectorParams(size=1536, distance=models.Distance.COSINE)
-client.recreate_collection(
-    collection_name=os.getenv("QDRANT_COLLECTION_ISLAMIC"),
-    vectors_config=vectors_config,
-)
+# vectors_config = models.VectorParams(size=1536, distance=models.Distance.COSINE)
+# client.recreate_collection(
+#     collection_name=os.getenv("QDRANT_COLLECTION_ISLAMIC"),
+#     vectors_config=vectors_config,
+# )
 print("collection created")
 loader = PyMuPDFLoader(
     "D:/projects/AI projects/privateGPT-main/source_documents/Tafsir_Al_Mizan_Vol1.pdf"

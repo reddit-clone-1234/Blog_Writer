@@ -55,9 +55,10 @@ def create_word_docx(user_input, paragraph, image_input):
     doc.add_paragraph(paragraph)
 
     # Add the image to the document
-    doc.add_heading("Image Input", level=1)
-    image_stream = io.BytesIO()
-    image_input.save(image_stream, format="PNG")
-    image_stream.seek(0)
-    doc.add_picture(image_stream, width=Inches(4))  # Adjust the width as needed
+    if image_input != None:
+        doc.add_heading("Image Input", level=1)
+        image_stream = io.BytesIO()
+        image_input.save(image_stream, format="PNG")
+        image_stream.seek(0)
+        doc.add_picture(image_stream, width=Inches(4))  # Adjust the width as needed
     return doc

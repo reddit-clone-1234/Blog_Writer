@@ -802,7 +802,6 @@ def main_function():
                         st.write(blog)
                         image_url = get_src_original_url(myTopic)
                         st.image(image_url)
-                        st.session_state.image_url_1 = image_url
                         img_res = requests.get(image_url)
                         img = Image.open(io.BytesIO(img_res.content))
                         doc = create_word_docx(myTopic, blog, img)
@@ -810,6 +809,8 @@ def main_function():
                         doc_buffer = io.BytesIO()
                         doc.save(doc_buffer)
                         doc_buffer.seek(0)
+
+                        st.session_state.image_url_1 = image_url
 
                         # get the number of words in a string: split on whitespace and end of line characters
                         blog_word_count = count_words_with_bullet_points(blog)
@@ -932,7 +933,15 @@ def main_function():
                         st.write("### Final Blog")
                         st.write(st.session_state.blog_1)
                         image_url = st.session_state.image_url_1
-
+                        st.image(image_url)
+                        img_res = requests.get(image_url)
+                        img = Image.open(io.BytesIO(img_res.content))
+                        doc = create_word_docx(myTopic, blog, img)
+                        # Save the Word document to a BytesIO buffer
+                        doc_buffer = io.BytesIO()
+                        doc.save(doc_buffer)
+                        doc_buffer.seek(0)
+                        st.success("Blog generated successfully")
                         # get the number of words in a string: split on whitespace and end of line characters
                         blog_word_count = count_words_with_bullet_points(blog)
                         st.write(f"> Blog word count: {blog_word_count}")
@@ -942,22 +951,14 @@ def main_function():
                         progress += 0.125
                         progress_bar.progress(progress)
                         st.balloons()
-                        st.image(image_url)
-                        # img_res = requests.get(image_url)
-                        # img = Image.open(io.BytesIO(img_res.content))
-                        # doc = create_word_docx(myTopic, blog, img)
-                        # # Save the Word document to a BytesIO buffer
-                        # doc_buffer = io.BytesIO()
-                        # doc.save(doc_buffer)
-                        # doc_buffer.seek(0)
-                        # st.success("Blog generated successfully")
+    
                         # # Prepare the download link
-                        # st.download_button(
-                        #     label="Download Word Document", 
-                        #     data=doc_buffer.getvalue(),
-                        #     file_name=f"{myTopic}.docx",
-                        #     mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                        # )
+                        st.download_button(
+                            label="Download Word Document", 
+                            data=doc_buffer.getvalue(),
+                            file_name=f"{myTopic}.docx",
+                            mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                        )
             except Exception as e:
                 print(e)
     else:

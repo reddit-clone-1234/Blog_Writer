@@ -941,22 +941,19 @@ def main_function():
                         doc_buffer = io.BytesIO()
                         doc.save(doc_buffer)
                         doc_buffer.seek(0)
-                        st.success("Blog generated successfully")
                         # get the number of words in a string: split on whitespace and end of line characters
-                        blog_word_count = count_words_with_bullet_points(blog)
+                        blog_word_count = count_words_with_bullet_points(st.session_state.blog_1)
                         st.write(f"> Blog word count: {blog_word_count}")
-                        st.write(
-                            f"> Generating the blog took ({round(end - start, 2)} s)"
-                        )
                         progress += 0.125
                         progress_bar.progress(progress)
+                        st.success("Blog generated successfully")
                         st.balloons()
     
                         # # Prepare the download link
                         st.download_button(
                             label="Download Word Document", 
                             data=doc_buffer.getvalue(),
-                            file_name=f"{myTopic}.docx",
+                            file_name=f"{st.session_state.title_1}.docx",
                             mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                         )
             except Exception as e:

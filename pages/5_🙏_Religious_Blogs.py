@@ -655,8 +655,14 @@ def main_function():
                     if st.session_state.blog_5 is not None:
                         st.write("### Final Blog")
                         st.write(st.session_state.blog_5)
+                        # get the number of words in a string: split on whitespace and end of line characters
+                        blog_word_count = count_words_with_bullet_points(
+                            st.session_state.blog_5
+                        )
+                        st.write(f"> Blog word count: {blog_word_count}")
                         progress = 1.0
                         progress_bar.progress(progress)
+                        st.success("Blog generated successfully")
                         st.balloons()
                         doc = create_word_docx(myTopic, st.session_state.blog_5, None)
                         # Save the Word document to a BytesIO buffer

@@ -799,16 +799,21 @@ def main_function():
                         end = time.time()
                         st.session_state.blog_1 = blog
                         st.write(blog)
-                        image_url = get_src_original_url(myTopic)
-                        st.image(image_url)
-                        img_res = requests.get(image_url)
-                        img = Image.open(io.BytesIO(img_res.content))
-                        doc = create_word_docx(myTopic, blog, img)
+                        try:
+                            image_url = get_src_original_url(myTopic)
+                            st.image(image_url)
+                            img_res = requests.get(image_url)
+                            img = Image.open(io.BytesIO(img_res.content))
+                            doc = create_word_docx(myTopic, blog, img)
+                        except Exception as e:
+                            image_url = None
+                            doc = create_word_docx(myTopic, blog, None)
+                            print("error in img")
                         # Save the Word document to a BytesIO buffer
                         doc_buffer = io.BytesIO()
                         doc.save(doc_buffer)
                         doc_buffer.seek(0)
-
+                        
                         st.session_state.image_url_1 = image_url
 
                         # get the number of words in a string: split on whitespace and end of line characters
@@ -932,10 +937,13 @@ def main_function():
                         st.write("### Final Blog")
                         st.write(st.session_state.blog_1)
                         image_url = st.session_state.image_url_1
-                        st.image(image_url)
-                        img_res = requests.get(image_url)
-                        img = Image.open(io.BytesIO(img_res.content))
-                        doc = create_word_docx(myTopic, st.session_state.blog_1, img)
+                        if image_url != None:
+                            st.image(image_url)
+                            img_res = requests.get(image_url)
+                            img = Image.open(io.BytesIO(img_res.content))
+                            doc = create_word_docx(myTopic, st.session_state.blog_1, img)
+                        else:
+                            doc = create_word_docx(myTopic, st.session_state.blog_1, None)
                         # Save the Word document to a BytesIO buffer
                         doc_buffer = io.BytesIO()
                         doc.save(doc_buffer)

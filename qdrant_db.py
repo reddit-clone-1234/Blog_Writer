@@ -54,12 +54,10 @@ text_splitter = RecursiveCharacterTextSplitter(
 # )
 print("collection created")
 loader = PyMuPDFLoader(
-    "D:/projects/AI projects/privateGPT-main/source_documents/Tafsir_Al_Mizan_Vol1.pdf"
+    "D:/projects/AI projects/privateGPT-main/source_documents/al_mizan_v_8.pdf"
 )
 print("loaders created")
 docs = loader.load_and_split(text_splitter=text_splitter)
-# print(bible_docs[0])
-# print(quran_docs[0])
 print("docs loaded")
 vectorStore.add_documents(docs)
-print("quran added")
+print("docs added")

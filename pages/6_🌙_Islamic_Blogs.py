@@ -75,49 +75,75 @@ def main_function():
 
         # Keyphrase extraction Agent
         llm_keywords = ChatOpenAI(temperature=0.5, model="gpt-3.5-turbo-16k")
-        keyword_extractor_tools = [
-            Tool(
-                name="Google Search",
-                description="Useful when you want to get the keywords from Google about single topic.",
-                func=google.run,
-            ),
-            Tool(
-                name="DuckDuckGo Search Evaluation",
-                description="Useful to evaluate the keywords of Google Search and add any missing keywords about specific topic.",
-                func=duck.run,
-            ),
-        ]
-        keyword_agent = initialize_agent(
-            agent_type=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
-            agent_name="Keyword extractor",
-            agent_description="You are a helpful AI that helps the user to get the important keyword list in bullet points from the search results about specific topic.",
+        # keyword_extractor_tools = [
+        #     Tool(
+        #         name="Google Search",
+        #         description="Useful when you want to get the keywords from Google about single topic.",
+        #         func=google.run,
+        #     ),
+        #     Tool(
+        #         name="DuckDuckGo Search Evaluation",
+        #         description="Useful to evaluate the keywords of Google Search and add any missing keywords about specific topic.",
+        #         func=duck.run,
+        #     ),
+        # ]
+        # keyword_agent = initialize_agent(
+        #     agent_type=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
+        #     agent_name="Keyword extractor",
+        #     agent_description="You are a helpful AI that helps the user to get the important keyword list in bullet points from the search results about specific topic.",
+        #     llm=llm_keywords,
+        #     tools=keyword_extractor_tools,
+        #     verbose=True,
+        #     handle_parsing_errors=True,
+        # )
+        keywords_prompt = "You are a helpful AI that helps the user to get the important keyword list in bullet points about {topic} using the following information: {information}."
+        keywords_prompt_template = PromptTemplate(
+            template=keywords_prompt,
+            input_variables=["topic", "information"],
+        )
+        keywords_chain = LLMChain(
             llm=llm_keywords,
-            tools=keyword_extractor_tools,
-            verbose=True,
-            handle_parsing_errors=True,
+            prompt=keywords_prompt_template,
         )
         # title and subtitle Agent
         title_llm = ChatOpenAI(
             temperature=0.5, model="gpt-3.5-turbo-16k"
         )  # temperature=0.7
-        title_tools = [
-            Tool(
-                name="Intermediate Answer",
-                description="Useful for when you need to get the title and subtitle for a blog about specific topic.",
-                func=google.run,
-            ),
-        ]
+        # title_tools = [
+        #     Tool(
+        #         name="Intermediate Answer",
+        #         description="Useful for when you need to get the title and subtitle for a blog about specific topic.",
+        #         func=google.run,
+        #     ),
+        # ]
 
-        title_agent = initialize_agent(
-            agent_type=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
-            agent_name="title and subtitle writer",
-            agent_description="You are a helpful AI that helps the user to write a title and subtitle for a blog about specific topic based on the given keywords",
-            llm=title_llm,
-            tools=title_tools,
-            verbose=True,
-            handle_parsing_errors=True,
+        # title_agent = initialize_agent(
+        #     agent_type=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
+        #     agent_name="title and subtitle writer",
+        #     agent_description="You are a helpful AI that helps the user to write a title and subtitle for a blog about specific topic based on the given keywords",
+        #     llm=title_llm,
+        #     tools=title_tools,
+        #     verbose=True,
+        #     handle_parsing_errors=True,
+        # )
+        title_prompt = "You are a helpful AI that helps the user to write a title for a blog about {topic} based on the following keywords {keywords} and using the following information {information}."
+        title_prompt_template = PromptTemplate(
+            template=title_prompt,
+            input_variables=["topic", "keywords", "information"],
         )
-
+        title_chain = LLMChain(
+            llm=title_llm,
+            prompt=title_prompt_template,
+        )
+        subtitle_prompt = "You are a helpful AI that helps the user to write a subtitle for a blog about {topic} with a title {title} based on the following keywords {keywords} and using the following information {information}."
+        subtitle_prompt_template = PromptTemplate(
+            template=subtitle_prompt,
+            input_variables=["topic", "title", "keywords", "information"],
+        )
+        subtitle_chain = LLMChain(
+            llm=title_llm,
+            prompt=subtitle_prompt_template,
+        )
         # summarize the results separately
         summary_prompt = """Please Provide a summary of the following essay
         The essay is: {essay}.
@@ -216,7 +242,7 @@ def main_function():
         # [SUMMARY AND CONCLUSION]
         # [REFERENCES]
         # """
-        prompt_writer = """You are an experienced writer and author and you will write a blog in long form sentences using correct English grammar, where the quality would be suitable for an established online publisher.
+        prompt_writer = """You are an experienced writer and author and you will write a blog in long form sentences using correct English grammar, where the quality would be suitable for academic publishing.
             First, Search about the best way to write a blog about {topic}. THE BLOG MUST BE RELEVANT TO THE TOPIC.
             Second, use the following outline to write the blog: {outline} because the blog must write about the bullet points inside it and contain this information.
             Don't use the same structure of the outline.
@@ -226,6 +252,7 @@ def main_function():
             The source of your information is the uploaded documents: {documents}.
             Third, Check if the blog contains these keywords {keywords} and if not, add them to the blog.
             Fourth, Count the number of words in the blog because the number of words must be maximized to be {wordCount} and add more words to the blog to reach that number of words.
+            Fifth, The blog must be written in an academic style because it will be published in an academic website.
             """
 
         prompt_writer_template_outline = PromptTemplate(
@@ -281,6 +308,7 @@ def main_function():
         4- Sources will be used as references so at the end of each paragraph, you should add a reference to the source using the source number in []. 
         So, after each paragraph in the blog, refer to the source index that most relevant to it using the source number in [].
         The used sources should be listed at the end of the blog.
+        5- The blog must be written in an academic style because it will be published in an academic website.
         [Sources]
         {sources} 
         [DRAFT]
@@ -335,6 +363,7 @@ def main_function():
             collection_name=QDRANT_COLLECTION_ISLAMIC,
             embeddings=embeddings,
         )
+        retriever = vectorStore.as_retriever(search_kwargs={"k": 10})
 
         st.subheader(
             "This is a blog writer agent that uses the following as sources of information:"
@@ -375,11 +404,18 @@ def main_function():
                     with st.spinner("Generating the keywords list..."):
                         st.write("### Keywords list")
                         start = time.time()
-                        keyword_list = keyword_agent.run(
-                            f"Search about {myTopic} and use the results to get the important keywords related to {myTopic} to help to write a blog about {myTopic}."
+                        # keyword_list = keyword_agent.run(
+                        #     f"Search about {myTopic} and use the results to get the important keywords related to {myTopic} to help to write a blog about {myTopic}."
+                        # )
+                        similar_docs = retriever.get_relevant_documents(
+                            f"topic: {myTopic}"
+                        )
+                        keyword_list = keywords_chain.run(
+                            topic=myTopic,
+                            information=similar_docs,
                         )
                         end = time.time()
-                        st.session_state.keywords_list_5 = keyword_list
+                        st.session_state.keywords_list_6 = keyword_list
                         # show the keywords list to the user
                         st.write(keyword_list)
                         st.write(
@@ -392,15 +428,29 @@ def main_function():
                         # Getting Title and SubTitle
                         st.write("### Title")
                         start = time.time()
-                        title = title_agent.run(
-                            f"Suggest a titel for a blog about {myTopic} using the following keywords {keyword_list}?",
+                        # title = title_agent.run(
+                        #     f"Suggest a titel for a blog about {myTopic} using the following keywords {keyword_list}?",
+                        # )
+                        # subtitle = title_agent.run(
+                        #     f"Suggest a suitable subtitle for a blog about {myTopic} for the a blog with a title {title} using the following keywords {keyword_list}?",
+                        # )
+                        similar_docs = retriever.get_relevant_documents(
+                            f"topic: {myTopic}, keywords: {keyword_list}"
                         )
-                        subtitle = title_agent.run(
-                            f"Suggest a suitable subtitle for a blog about {myTopic} for the a blog with a title {title} using the following keywords {keyword_list}?",
+                        title = title_chain.run(
+                            topic=myTopic,
+                            keywords=keyword_list,
+                            information=similar_docs,
+                        )
+                        subtitle = subtitle_chain.run(
+                            topic=myTopic,
+                            title=title,
+                            keywords=keyword_list,
+                            information=similar_docs,
                         )
                         end = time.time()
-                        st.session_state.title_5 = title
-                        st.session_state.subtitle_5 = subtitle
+                        st.session_state.title_6 = title
+                        st.session_state.subtitle_6 = subtitle
                         st.write(title)
                         st.write("### Subtitle")
                         st.write(subtitle)
@@ -418,7 +468,6 @@ def main_function():
 
                         print("reading vector store...")
 
-                        retriever = vectorStore.as_retriever(search_kwargs={"k": 10})
                         print("Vector store created.")
                         similar_docs = retriever.get_relevant_documents(
                             f"title: {title}, subtitle: {subtitle}, keywords: {keyword_list}"
@@ -431,7 +480,7 @@ def main_function():
                             keywords=keyword_list,
                         )
                         end = time.time()
-                        st.session_state.blog_outline_5 = blog_outline
+                        st.session_state.blog_outline_6 = blog_outline
                         st.write(blog_outline)
                         # get the number of words in a string: split on whitespace and end of line characters
                         # blog_outline_word_count = count_words_with_bullet_points(blog_outline)
@@ -458,7 +507,7 @@ def main_function():
                             wordCount=myWordCount,
                         )
                         end = time.time()
-                        st.session_state.draft1_5 = draft1
+                        st.session_state.draft1_6 = draft1
                         st.write(draft1)
                         # get the number of words in a string: split on whitespace and end of line characters
                         draft1_word_count = count_words_with_bullet_points(draft1)
@@ -500,7 +549,7 @@ def main_function():
                         #     include_run_info=True,
                         # )
                         end = time.time()
-                        st.session_state.draft1_reference_5 = draft1_reference
+                        st.session_state.draft1_reference_6 = draft1_reference
                         # draft1_reference = reference_agent.run(
                         #     f"First, Search for each paragraph in the following text {draft1} to get the most relevant links. \ Then, list those links and order with respect to the order of using them in the blog."
                         # )
@@ -548,7 +597,7 @@ def main_function():
                             + str([doc.metadata for doc in similar_docs]),
                         )
                         end = time.time()
-                        st.session_state.draft2_5 = draft2
+                        st.session_state.draft2_6 = draft2
                         st.write(draft2)
                         # get the number of words in a string: split on whitespace and end of line characters
                         draft2_word_count = count_words_with_bullet_points(draft2)
@@ -576,7 +625,7 @@ def main_function():
                             + str([doc.metadata for doc in similar_docs]),
                         )
                         end = time.time()
-                        st.session_state.blog_5 = blog
+                        st.session_state.blog_6 = blog
                         st.write(blog)
                         # get the number of words in a string: split on whitespace and end of line characters
                         blog_word_count = count_words_with_bullet_points(blog)
@@ -612,59 +661,59 @@ def main_function():
             try:
                 print("not pressed")
                 with tab1:
-                    if st.session_state["keywords_list_5"] is not None:
+                    if st.session_state["keywords_list_6"] is not None:
                         st.write("### Keywords list")
-                        st.write(st.session_state["keywords_list_5"])
+                        st.write(st.session_state["keywords_list_6"])
                         progress += 0.16667
                         progress_bar.progress(progress)
 
                 with tab2:
-                    if st.session_state["title_5"] is not None:
+                    if st.session_state["title_6"] is not None:
                         st.write("### Title")
-                        st.write(st.session_state["title_5"])
+                        st.write(st.session_state["title_6"])
                         st.write("### Subtitle")
-                        st.write(st.session_state.subtitle_5)
+                        st.write(st.session_state.subtitle_6)
                         progress += 0.16667
                         progress_bar.progress(progress)
 
                 with tab3:
-                    if st.session_state.blog_outline_5 is not None:
+                    if st.session_state.blog_outline_6 is not None:
                         st.write("### Blog Outline")
-                        st.write(st.session_state.blog_outline_5)
+                        st.write(st.session_state.blog_outline_6)
                         progress += 0.16667
                         progress_bar.progress(progress)
 
                 with tab4:
-                    if st.session_state.draft1_5 is not None:
+                    if st.session_state.draft1_6 is not None:
                         st.write("### Draft 1")
-                        st.write(st.session_state.draft1_5)
+                        st.write(st.session_state.draft1_6)
                         st.write("### Draft 1 References")
-                        st.write(st.session_state.draft1_reference_5["answer"] + "\n\n")
-                        st.write(st.session_state.draft1_reference_5["sources"])
+                        st.write(st.session_state.draft1_reference_6["answer"] + "\n\n")
+                        st.write(st.session_state.draft1_reference_6["sources"])
                         progress += 0.16667
                         progress_bar.progress(progress)
 
                 with tab5:
-                    if st.session_state.draft2_5 is not None:
+                    if st.session_state.draft2_6 is not None:
                         st.write("### Draft 2")
-                        st.write(st.session_state.draft2_5)
+                        st.write(st.session_state.draft2_6)
                         progress += 0.16667
                         progress_bar.progress(progress)
 
                 with tab6:
-                    if st.session_state.blog_5 is not None:
+                    if st.session_state.blog_6 is not None:
                         st.write("### Final Blog")
-                        st.write(st.session_state.blog_5)
+                        st.write(st.session_state.blog_6)
                         # get the number of words in a string: split on whitespace and end of line characters
                         blog_word_count = count_words_with_bullet_points(
-                            st.session_state.blog_5
+                            st.session_state.blog_6
                         )
                         st.write(f"> Blog word count: {blog_word_count}")
                         progress = 1.0
                         progress_bar.progress(progress)
                         st.success("Blog generated successfully")
                         st.balloons()
-                        doc = create_word_docx(myTopic, st.session_state.blog_5, None)
+                        doc = create_word_docx(myTopic, st.session_state.blog_6, None)
                         # Save the Word document to a BytesIO buffer
                         doc_buffer = io.BytesIO()
                         doc.save(doc_buffer)

@@ -28,8 +28,7 @@ vectorStore = Qdrant(
     embeddings=embeddings,
 )
 retriever = vectorStore.as_retriever(search_kwargs={"k": 10})
-similar_docs = retriever.search("الله")
-print(similar_docs[0])
+
 text_splitter = RecursiveCharacterTextSplitter(
     separators=[
         ".",
@@ -55,11 +54,11 @@ text_splitter = RecursiveCharacterTextSplitter(
 #     vectors_config=vectors_config,
 # )
 # print("collection created")
-# loader = PyMuPDFLoader(
-#     "D:/projects/AI projects/privateGPT-main/source_documents/al_mizan_v_10.pdf"
-# )
-# print("loaders created")
-# docs = loader.load_and_split(text_splitter=text_splitter)
-# print("docs loaded")
-# vectorStore.add_documents(docs)
-# print("docs added")
+loader = PyMuPDFLoader(
+    "D:/projects/AI projects/privateGPT-main/source_documents/an_enlightening_commentary_into_the_light_of_the_holy_quran_v_7.pdf"
+)
+print("loaders created")
+docs = loader.load_and_split(text_splitter=text_splitter)
+print("docs loaded")
+vectorStore.add_documents(docs)
+print("docs added")

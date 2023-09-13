@@ -96,7 +96,7 @@ def main_function():
         #     verbose=True,
         #     handle_parsing_errors=True,
         # )
-        keywords_prompt = "You are a helpful AI that helps the user to get the important keyword list in bullet points about {topic} using the following information: {information}."
+        keywords_prompt = """You are a helpful AI that helps the user to get the important keyword list in bullet points to write a reasearch paper about {topic} using the following information: {information}."""
         keywords_prompt_template = PromptTemplate(
             template=keywords_prompt,
             input_variables=["topic", "information"],
@@ -112,7 +112,7 @@ def main_function():
         # title_tools = [
         #     Tool(
         #         name="Intermediate Answer",
-        #         description="Useful for when you need to get the title and subtitle for a blog about specific topic.",
+        #         description="Useful for when you need to get the title and subtitle for a research paper about specific topic.",
         #         func=google.run,
         #     ),
         # ]
@@ -120,13 +120,13 @@ def main_function():
         # title_agent = initialize_agent(
         #     agent_type=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
         #     agent_name="title and subtitle writer",
-        #     agent_description="You are a helpful AI that helps the user to write a title and subtitle for a blog about specific topic based on the given keywords",
+        #     agent_description="You are a helpful AI that helps the user to write a title and subtitle for a research paper about specific topic based on the given keywords",
         #     llm=title_llm,
         #     tools=title_tools,
         #     verbose=True,
         #     handle_parsing_errors=True,
         # )
-        title_prompt = "You are a helpful AI that helps the user to write a title for a blog about {topic} based on the following keywords {keywords} and using the following information {information}."
+        title_prompt = "You are a helpful AI that helps the user to write a title for a research paper about {topic} based on the following keywords {keywords} and using the following information {information}."
         title_prompt_template = PromptTemplate(
             template=title_prompt,
             input_variables=["topic", "keywords", "information"],
@@ -135,7 +135,7 @@ def main_function():
             llm=title_llm,
             prompt=title_prompt_template,
         )
-        subtitle_prompt = "You are a helpful AI that helps the user to write a subtitle for a blog about {topic} with a title {title} based on the following keywords {keywords} and using the following information {information}."
+        subtitle_prompt = "You are a helpful AI that helps the user to write a subtitle for a research paper about {topic} with a title {title} based on the following keywords {keywords} and using the following information {information}."
         subtitle_prompt_template = PromptTemplate(
             template=subtitle_prompt,
             input_variables=["topic", "title", "keywords", "information"],
@@ -207,52 +207,32 @@ def main_function():
             # verbose=True,
             handle_parsing_errors=True,
         )
-        # create a blog writer agent
-        prompt_writer_outline = """You are an expert online blogger with expert writing skills and I want you to only write out the breakdown of each section of the blog on the topic of {topic} 
+        # create a research paper writer agent
+        prompt_writer_outline = """You are an academic wrtier with expert writing skills and I want you to only write out the breakdown of each section of the research paper on the topic of {topic} 
         using the following information:
         keywords: {keywords}.
         The title is: {title}.
         The subtitle is: {subtitle}.
-        uploaded documents: {documents}.
-        use the following template to write the blog:
+        relevant documents: {documents}.
+        use the following template to write the research paper:
         [TITLE]
         [SUBTITLE]
         [introduction]
         [BODY IN DETIALED BULLET POINTS]
         [SUMMARY AND CONCLUSION]
         """
-        # prompt_writer_outline = """You are an expert online blogger with expert writing skills and I want you to only write out the breakdown of each section of the blog on the topic of {topic}
-        # using the following information:
-        # keywords: {keywords}.
-        # The title is: {title}.
-        # The subtitle is: {subtitle}.
-        # google results: {google_results}.
-        # wiki results: {wiki_results}.
-        # duck results: {duck_results}.
-        # google summary: {google_summary}.
-        # duck summary: {duck_summary}.
-        # The results summary is: {summary}.
-        # Websites: {websites} will be used as references so at the end of each paragraph, you should add a reference to the website using the webstie number in [].
-        # The outline should be very detailed so that the number of words will be maximized so use all the previous information, with an introduction at the beginning and a conclusion at the end of the blog.
-        # use the following template to write the blog:
-        # [TITLE]
-        # [SUBTITLE]
-        # [introduction]
-        # [BODY IN DETIALED BULLET POINTS]
-        # [SUMMARY AND CONCLUSION]
-        # [REFERENCES]
-        # """
-        prompt_writer = """You are an experienced writer and author and you will write a blog in long form sentences using correct English grammar, where the quality would be suitable for academic publishing.
-            First, Search about the best way to write a blog about {topic}. THE BLOG MUST BE RELEVANT TO THE TOPIC.
-            Second, use the following outline to write the blog: {outline} because the blog must write about the bullet points inside it and contain this information.
+
+        prompt_writer = """You are an experienced writer and author and you will write a research paper in long form sentences using correct English grammar, where the quality would be suitable for academic publishing.
+            First, Search about the best way to write a research paper about {topic}. THE RESEARCH PAPER MUST BE RELEVANT TO THE TOPIC.
+            Second, use the following outline to write the research paper: {outline} because the research paper must write about the bullet points inside it and contain this information.
             Don't use the same structure of the outline.
-            Remove any bullet points and numbering systems so that the flow of the blog will be smooth.
-            The blog should be structured implicitly, with an introduction at the beginning and a conclusion at the end of the blog without using the words introduction, body and conclusion.
-            Try to use different words and sentences to make the blog more interesting.
-            The source of your information is the uploaded documents: {documents}.
-            Third, Check if the blog contains these keywords {keywords} and if not, add them to the blog.
-            Fourth, Count the number of words in the blog because the number of words must be maximized to be {wordCount} and add more words to the blog to reach that number of words.
-            Fifth, The blog must be written in an academic style because it will be published in an academic website.
+            Remove any bullet points and numbering systems so that the flow of the research paper will be smooth.
+            The research paper should be structured implicitly, with an introduction at the beginning and a conclusion at the end of the research paper without using the words introduction, body and conclusion.
+            Try to use different words and sentences to make the research paper more interesting.
+            The source of your information is the following documents: {documents}.
+            Third, Check if the research paper contains these keywords {keywords} and if not, add them to the research paper.
+            Fourth, Count the number of words in the research paper because the number of words must be maximized to be {wordCount} and add more words to the research paper to reach that number of words.
+            Fifth, The research paper must be written in an academic style because it will be published as academic paper.
             """
 
         prompt_writer_template_outline = PromptTemplate(
@@ -287,7 +267,7 @@ def main_function():
             prompt=prompt_writer_template_outline,
             # verbose=True,
         )
-        # create a blog writer agent
+        # create a research paper writer agent
         writer_llm = ChatOpenAI(temperature=0, model="gpt-3.5-turbo-16k")
         writer_chain = LLMChain(
             llm=writer_llm,
@@ -301,14 +281,14 @@ def main_function():
         # evaluation agent
         evaluation_llm = ChatOpenAI(temperature=0, model="gpt-3.5-turbo-16k")
 
-        evaluation_prompt = """You are an expert blogs editor and you will edit the draft to satisfy the following criteria:
-        1- The blog must be relevant to {topic}.
-        2- The blog must contain the following keywords: {keywords}.
-        3- The blog must contain at least {wordCount} words so use the summary {summary} to add an interesting senternces to the blog.
+        evaluation_prompt = """You are an expert academic papers editor and you will edit the draft to satisfy the following criteria:
+        1- The research paper must be relevant to {topic}.
+        2- The research paper must contain the following keywords: {keywords}.
+        3- The research paper must contain at least {wordCount} words so use the summary {summary} to add an interesting senternces to the research paper.
         4- Sources will be used as references so at the end of each paragraph, you should add a reference to the source using the source number in []. 
-        So, after each paragraph in the blog, refer to the source index that most relevant to it using the source number in [].
-        The used sources should be listed at the end of the blog.
-        5- The blog must be written in an academic style because it will be published in an academic website.
+        So, after each paragraph in the research paper, refer to the source index that most relevant to it using the source number in [].
+        The used sources should be listed at the end of the research paper.
+        5- The research paper must be written in an academic style because it will be published as academpic paper.
         [Sources]
         {sources} 
         [DRAFT]
@@ -316,19 +296,9 @@ def main_function():
         The Result should be:
         1- All the mistakes according to the above criteria listed in bullet points:
         [MISTAKES]\n
-        2- The edited draft of the blog:
+        2- The edited draft of the research paper:
         [EDITED DRAFT]
         """
-        # evaluation_prompt = """You are an online blog editor. Given the draft of a blog,
-        # it is your job to edit this draft in terms of the following criteria:
-        # 1- Relevance to the blog title and subtitle.
-        # 2- Relevance to the blog topic.
-        # 3- Relevance to the blog keywords.
-        # 4- The number of words in the blog must be as desired.
-
-        # Blog Draft:
-        # {draft}
-        # Edit this draft to satisfy the above criteria."""
         evaluation_prompt_template = PromptTemplate(
             template=evaluation_prompt,
             input_variables=[
@@ -344,7 +314,7 @@ def main_function():
         evaluation_chain = LLMChain(
             llm=evaluation_llm,
             prompt=evaluation_prompt_template,
-            # output_key="blog",
+            # output_key="research paper",
             verbose=True,
         )
 
@@ -366,15 +336,15 @@ def main_function():
         retriever = vectorStore.as_retriever(search_kwargs={"k": 10})
 
         st.subheader(
-            "This is a blog writer agent that uses the following as sources of information:"
+            "This is a research paper writer agent that uses the following as sources of information:"
         )
         # unordered list
         st.markdown("""- Tafsir Al-Mizan for Quran""")
 
-        myTopic = st.text_input("Write a blog about: ", key="query")
+        myTopic = st.text_input("Write a research paper about: ", key="query")
 
         myWordCount = st.number_input(
-            "Enter the word count of the blog", min_value=100, max_value=3000, step=100
+            "Enter the word count of the research paper", min_value=100, max_value=3000, step=100
         )
 
         goBtn = st.button("**Go**", key="go", use_container_width=True)
@@ -405,7 +375,7 @@ def main_function():
                         st.write("### Keywords list")
                         start = time.time()
                         # keyword_list = keyword_agent.run(
-                        #     f"Search about {myTopic} and use the results to get the important keywords related to {myTopic} to help to write a blog about {myTopic}."
+                        #     f"Search about {myTopic} and use the results to get the important keywords related to {myTopic} to help to write a research paper about {myTopic}."
                         # )
                         similar_docs = retriever.get_relevant_documents(
                             f"topic: {myTopic}"
@@ -429,10 +399,10 @@ def main_function():
                         st.write("### Title")
                         start = time.time()
                         # title = title_agent.run(
-                        #     f"Suggest a titel for a blog about {myTopic} using the following keywords {keyword_list}?",
+                        #     f"Suggest a titel for a research paper about {myTopic} using the following keywords {keyword_list}?",
                         # )
                         # subtitle = title_agent.run(
-                        #     f"Suggest a suitable subtitle for a blog about {myTopic} for the a blog with a title {title} using the following keywords {keyword_list}?",
+                        #     f"Suggest a suitable subtitle for a research paper about {myTopic} for the a research paper with a title {title} using the following keywords {keyword_list}?",
                         # )
                         similar_docs = retriever.get_relevant_documents(
                             f"topic: {myTopic}, keywords: {keyword_list}"
@@ -461,8 +431,8 @@ def main_function():
                         progress_bar.progress(progress)
 
                 with tab3:
-                    with st.spinner("Generating the blog outline..."):
-                        # write the blog outline
+                    with st.spinner("Generating the research paper outline..."):
+                        # write the research paper outline
                         st.write("### Blog Outline")
                         start = time.time()
 
@@ -493,11 +463,11 @@ def main_function():
 
                 with tab4:
                     with st.spinner("Writing the draft 1..."):
-                        # write the blog
+                        # write the research paper
                         st.write("### Draft 1")
                         start = time.time()
                         similar_docs = retriever.get_relevant_documents(
-                            f"blog outline: {blog_outline}"
+                            f"research paper outline: {blog_outline}"
                         )
                         draft1 = writer_chain.run(
                             topic=myTopic,
@@ -519,7 +489,7 @@ def main_function():
                         st.success("Draft 1 generated successfully")
 
                     with st.spinner("Referencing the first draft..."):
-                        # reference the blog
+                        # reference the research paper
                         st.write("### Draft 1 References")
                         start = time.time()
 
@@ -538,20 +508,20 @@ def main_function():
 
                         draft1_reference = chain(
                             {
-                                "question": f"First, Search for each paragraph in the following text {draft1} to get the most relevant source. \ Then, list those sources and order with respect to the order of using them in the blog. The sources are documents with page numbers."
+                                "question": f"First, Search for each paragraph in the following text {draft1} to get the most relevant source. \ Then, list those sources and order with respect to the order of using them in the research paper. The sources are documents with page numbers."
                             },
                             include_run_info=True,
                         )
                         # draft1_reference_from_chain_type = chain_from_chain_type(
                         #     {
-                        #         "question": f"First, Search for each paragraph in the following text {draft1} to get the most relevant source. \ Then, list those sources and order with respect to the order of using them in the blog. The sources should be the part of the document that contains the paragraph"
+                        #         "question": f"First, Search for each paragraph in the following text {draft1} to get the most relevant source. \ Then, list those sources and order with respect to the order of using them in the research paper. The sources should be the part of the document that contains the paragraph"
                         #     },
                         #     include_run_info=True,
                         # )
                         end = time.time()
                         st.session_state.draft1_reference_6 = draft1_reference
                         # draft1_reference = reference_agent.run(
-                        #     f"First, Search for each paragraph in the following text {draft1} to get the most relevant links. \ Then, list those links and order with respect to the order of using them in the blog."
+                        #     f"First, Search for each paragraph in the following text {draft1} to get the most relevant links. \ Then, list those links and order with respect to the order of using them in the research paper."
                         # )
                         st.write("#### Relevant Text")
                         st.write(draft1_reference["answer"])
@@ -580,7 +550,7 @@ def main_function():
                 # st.write(f"> Draft 1 word count: {draft1_word_count}")
 
                 # st.write("### Draft 2")
-                # st.write(drafts["blog"])
+                # st.write(drafts["research paper"])
                 #######################################
                 with tab5:
                     with st.spinner("Writing the second draft..."):
@@ -611,8 +581,8 @@ def main_function():
                         progress_bar.progress(progress)
                 # edit the second draft
                 with tab6:
-                    with st.spinner("Writing the final blog..."):
-                        # write the blog
+                    with st.spinner("Writing the final research paper..."):
+                        # write the research paper
                         st.write("### Final Blog")
                         start = time.time()
                         blog = evaluation_chain.run(
@@ -631,7 +601,7 @@ def main_function():
                         blog_word_count = count_words_with_bullet_points(blog)
                         st.write(f"> Blog word count: {blog_word_count}")
                         st.write(
-                            f"> Generating the blog took ({round(end - start, 2)} s)"
+                            f"> Generating the research paper took ({round(end - start, 2)} s)"
                         )
                         st.success("Blog generated successfully")
                         progress = 1.0
@@ -650,10 +620,10 @@ def main_function():
                         )
                     # st.snow()
                 # add copy button to copy the draft to the clipboard
-                # copy_btn = st.button("Copy the blog to clipboard", key="copy1")
+                # copy_btn = st.button("Copy the research paper to clipboard", key="copy1")
                 # if copy_btn:
                 #     pyperclip.copy(draft1)
-                # st.success("The blog copied to clipboard")
+                # st.success("The research paper copied to clipboard")
             except Exception as e:
                 st.error("Something went wrong, please try again")
                 st.error(e)
@@ -732,7 +702,7 @@ def main_function():
 
 def main():
     st.set_page_config(page_title="Blog Writer Agent", page_icon="💬", layout="wide")
-    st.title("Blog Writer Agent: Write a blog about any topic 💬")
+    st.title("Blog Writer Agent: Write an islamic research paper about any topic 💬")
     with open("./etc/secrets/config.yaml") as file:
         config = yaml.load(file, Loader=SafeLoader)
     authenticator = stauth.Authenticate(

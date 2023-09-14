@@ -288,7 +288,8 @@ def main_function():
         4- Sources will be used as references so at the end of each paragraph, you should add a reference to the source using the source number in []. 
         So, after each paragraph in the research paper, refer to the source index that most relevant to it using the source number in [].
         The used sources should be listed at the end of the research paper.
-        5- The research paper must be written in an academic style because it will be published as academpic paper.
+        the references should be in the following format: authors name, title of book, volume number, page number.
+        5- The research paper must be written in an academic style because it will be published as academic paper.
         [Sources]
         {sources} 
         [DRAFT]
@@ -508,7 +509,7 @@ def main_function():
 
                         draft1_reference = chain(
                             {
-                                "question": f"First, Search for each paragraph in the following text {draft1} to get the most relevant source. \ Then, list those sources and order with respect to the order of using them in the research paper. The sources are documents with page numbers."
+                                "question": f"First, Search for each paragraph in the following text {draft1} to get the most relevant source. \ Then, list those sources and order with respect to the order of using them in the research paper. The sources format should be: authors name, title of book, volume number, page number"
                             },
                             include_run_info=True,
                         )

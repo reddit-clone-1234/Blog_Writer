@@ -55,7 +55,7 @@ text_splitter = RecursiveCharacterTextSplitter(
 # )
 # print("collection created")
 loader = PyMuPDFLoader(
-    "D:/projects/AI projects/privateGPT-main/source_documents/an_enlightening_commentary_into_the_light_of_the_holy_quran_v_7.pdf"
+    "D:/projects/AI projects/privateGPT-main/source_documents/al_mizan_01.pdf"
 )
 print("loaders created")
 docs = loader.load_and_split(text_splitter=text_splitter)

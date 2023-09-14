@@ -221,19 +221,36 @@ def main_function():
         [BODY IN DETIALED BULLET POINTS]
         [SUMMARY AND CONCLUSION]
         """
-
-        prompt_writer = """You are an experienced writer and author and you will write a research paper in long form sentences using correct English grammar, where the quality would be suitable for academic publishing.
-            First, Search about the best way to write a research paper about {topic}. THE RESEARCH PAPER MUST BE RELEVANT TO THE TOPIC.
-            Second, use the following outline to write the research paper: {outline} because the research paper must write about the bullet points inside it and contain this information.
-            Don't use the same structure of the outline.
-            Remove any bullet points and numbering systems so that the flow of the research paper will be smooth.
-            The research paper should be structured implicitly, with an introduction at the beginning and a conclusion at the end of the research paper without using the words introduction, body and conclusion.
-            Try to use different words and sentences to make the research paper more interesting.
-            The source of your information is the following documents: {documents}.
-            Third, Check if the research paper contains these keywords {keywords} and if not, add them to the research paper.
-            Fourth, Count the number of words in the research paper because the number of words must be maximized to be {wordCount} and add more words to the research paper to reach that number of words.
-            Fifth, The research paper must be written in an academic style because it will be published as academic paper.
-            """
+        prompt_writer = """You are an experienced academic researcher and academic writer using correct English grammar, where the quality would be suitable for academic journal publications.
+                You will write an academic journal based on the {topic}. IT IS REALLY IMPORTANT THE RESEARCH PAPER MUST BE RELEVANT TO THE TOPIC.
+                Follow this {outline} to to help with ideas and points around the topic of the journal.
+                Don't use the same structure of the outline. Remove any bullet points and numbering systems.
+        Source Of Information.
+        The source of your information is the following documents: {documents}.
+        The layout and structure of the output must be in long form sentences and long paragraph. Each paragraph must make its own point and must include reference to the documents.
+        Write as a third party researcher, referring to the documents' author and their view is.
+        Point of view
+        You are not required to give your point of view. You must write from the perspective of a researcher providing the point of view of the author and refer to the author by name and quote their book using quotation marks and reference. It must be made clear who's opinion you are quoting.
+        Structure Of Academic Journal
+        The research paper should be structured implicitly, with an introduction at the beginning and a conclusion at the end of the research paper without using the words introduction, body and conclusion.
+        You must write in long sentences, suitable for an academic style. Try to use different words and sentences to make the research paper more interesting.
+        Use Keywords
+        Check if the research paper contains these keywords {keywords} and if not, add them to the research paper.
+        Word Count.
+        Count the number of words in the research paper because the number of words must be maximized to be {wordCount} and add more words to the research paper to reach that number of words.
+        """
+        # prompt_writer = """You are an experienced writer and author and you will write a research paper in long form sentences using correct English grammar, where the quality would be suitable for academic publishing.
+        #     First, Search about the best way to write a research paper about {topic}. THE RESEARCH PAPER MUST BE RELEVANT TO THE TOPIC.
+        #     Second, use the following outline to write the research paper: {outline} because the research paper must write about the bullet points inside it and contain this information.
+        #     Don't use the same structure of the outline.
+        #     Remove any bullet points and numbering systems so that the flow of the research paper will be smooth.
+        #     The research paper should be structured implicitly, with an introduction at the beginning and a conclusion at the end of the research paper without using the words introduction, body and conclusion.
+        #     Try to use different words and sentences to make the research paper more interesting.
+        #     The source of your information is the following documents: {documents}.
+        #     Third, Check if the research paper contains these keywords {keywords} and if not, add them to the research paper.
+        #     Fourth, Count the number of words in the research paper because the number of words must be maximized to be {wordCount} and add more words to the research paper to reach that number of words.
+        #     Fifth, The research paper must be written in an academic style because it will be published as academic paper.
+        #     """
 
         prompt_writer_template_outline = PromptTemplate(
             template=prompt_writer_outline,
